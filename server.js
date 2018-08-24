@@ -20,11 +20,11 @@ mongoose.connect("mongodb://localhost/mongoosing");
 
 app.get("/scrape", function(req, res) {
   
-  axios.get("http://www.echojs.com/").then(function(response) {
+  axios.get("https://www.theartnewspaper.com/").then(function(response) {
    
     var $ = cheerio.load(response.data);
 
-    $("article h2").each(function(i, element) {
+    $("a.cp-link").each(function(i, element) {
      
       var result = {};
 
@@ -54,7 +54,7 @@ app.get("/scrape", function(req, res) {
   });
 });
 
-// Route for getting all Articles from the db
+
 app.get("/news", function(req, res) {
 
   db.News.find({})
@@ -73,7 +73,7 @@ app.get("/news/:id", function(req, res) {
 
   db.News.findOne({ _id: req.params.id })
  
-    .populate("note")
+    .populate("comment")
     .then(function(dbNews) {
     
       res.json(dbNews);
@@ -90,7 +90,7 @@ app.post("/news/:id", function(req, res) {
   db.Comments.create(req.body)
     .then(function(dbComment) {
      
-      return db.News.findOneAndUpdate({ _id: req.params.id }, { note: dbComment._id }, { new: true });
+      return db.News.findOneAndUpdate({ _id: req.params.id }, { comment: dbComment._id }, { new: true });
     })
 
     .then(function(dbNews) {
